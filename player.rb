@@ -1,17 +1,30 @@
 class Player
+  attr_reader :hp
+
   def play_turn(warrior)
     if warrior.feel.empty?
       if warrior.health > 18
         warrior.walk!
       else
-        warrior.rest!
+        if hp_dropped_since_last_turn? warrior
+          warrior.walk!
+        else
+          warrior.rest!
+        end
       end
     else
-      if warrior.health > 5
+      if warrior.health > 10
         warrior.attack!
       else
         warrior.walk! :backward
       end
     end
+    @hp = warrior.health
+  end
+
+  private
+  def hp_dropped_since_last_turn? warrior
+    return if hp.nil?
+    warrior.health < hp
   end
 end
