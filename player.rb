@@ -12,6 +12,8 @@ class Player
           warrior.rest!
         end
       end
+    elsif warrior.feel.captive?
+      warrior.rescue!
     else
       if warrior.health > 10
         warrior.attack!
@@ -24,7 +26,7 @@ class Player
 
   private
   def hp_dropped_since_last_turn? warrior
-    return if hp.nil?
+    return false if hp.nil?
     warrior.health < hp
   end
 end

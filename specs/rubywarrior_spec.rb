@@ -14,10 +14,16 @@ end
 
 describe "a warrior" do
   let (:warrior) { mock('warrior').as_null_object }
+  let (:feel) { mock('feel').as_null_object }
+  before do 
+    warrior.stub(:feel => feel)
+    feel.stub :empty? => false
+    feel.stub :captive? => false
+  end
 
   context "when there is nothing in the way" do
     before do
-      warrior.stub_chain(:feel, :empty?).and_return(true)
+      feel.stub :empty? => true
     end
 
     it "should walk forward when hp is greater than 18" do
@@ -53,19 +59,31 @@ describe "a warrior" do
     # end
   end
 
-  context "when there is something in the way" do
+  context "when there is a captive in front" do
     before do
-      warrior.stub_chain(:feel, :empty?).and_return(false)
+      feel.stub :captive? => true
     end
 
-    it "should attack when hp is greater than 10" do
+    it "should rescue" do
+      warrior.should_receive(:rescue!)
+
+      Player.new.play_turn(warrior)
+    end
+  end
+
+  context "when there is something in the way" do
+    before do
+      feel.stub :empty? => false
+    end
+
+    it "should attack when hp is greater than 10 if there is an enemy" do
       warrior.stub :health => 15
       warrior.should_receive(:attack!)
 
       Player.new.play_turn(warrior)
     end
 
-    it "should back up when hp is at 10 or lower" do
+    it "should back up when hp is at 10 or lower if there is an enemy" do
       warrior.stub :health => 10
       warrior.should_receive(:walk!).with(:backward)
 
