@@ -69,15 +69,6 @@ describe "a warrior" do
       player.stub(:hp => 12)
       player.play_turn(warrior)
     end
-
-    # it "should back up when hp is 18 or lower and the current hp is lower than the last turn's hp" do
-    #   warrior.stub :health => 9
-    #   warrior.should_receive(:walk!).with(:backward)
-
-    #   player = Player.new
-    #   player.stub(:hp => 12)
-    #   player.play_turn(warrior)
-    # end
   end
 
   context "when there is a captive in front" do
@@ -109,6 +100,15 @@ describe "a warrior" do
       warrior.should_receive(:walk!).with(:backward)
 
       Player.new.play_turn(warrior)
+    end
+
+    it "should attack if there is an archer in front, even when hp is low" do
+      warrior.stub :health => 6
+      player = Player.new
+      player.stub :has_archer_present? => true
+      warrior.should_receive(:attack!)
+
+      player.play_turn(warrior)
     end
   end
 end

@@ -17,7 +17,7 @@ class Player
     elsif warrior.feel.captive?
       warrior.rescue!
     else
-      if warrior.health > 10
+      if warrior.health > 10 || has_archer_present?
         warrior.attack!
       else
         warrior.walk! :backward
