@@ -2,11 +2,13 @@ class Player
   attr_reader :hp
 
   def play_turn(warrior)
+    @warrior = warrior
+    check_archer_presence
     if warrior.feel.empty?
       if warrior.health > 18
         warrior.walk!
       else
-        if hp_dropped_since_last_turn? warrior
+        if has_archer_present?
           warrior.walk!
         else
           warrior.rest!
@@ -24,9 +26,19 @@ class Player
     @hp = warrior.health
   end
 
+  def has_archer_present?
+    @archer_present
+  end
+
   private
-  def hp_dropped_since_last_turn? warrior
+  def check_archer_presence
+    if @warrior.feel.empty?
+      @archer_present = hp_dropped_since_last_turn?
+    end
+  end
+
+  def hp_dropped_since_last_turn?
     return false if hp.nil?
-    warrior.health < hp
+    @warrior.health < hp
   end
 end

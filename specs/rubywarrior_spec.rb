@@ -1,14 +1,35 @@
 require File.expand_path(__FILE__ + '/../../player')
 
 describe "a player" do
-  it "should remember its warrior's last hp" do
-    warrior = mock('warrior').as_null_object
-    warrior.stub(:health => 7)
+  let(:warrior) { mock('warrior').as_null_object }
 
+  it "should remember its warrior's last hp" do
+    warrior.stub(:health => 7)
     player = Player.new
+
     player.play_turn(warrior)
 
     player.hp.should == 7
+  end
+
+  it "should know when there is an archer in front" do
+    warrior.stub(:health => 10)
+    player = Player.new
+    player.stub(:hp => 12)
+
+    player.play_turn(warrior)
+
+    player.should have_archer_present
+  end
+
+  it "should know when there is no archer in front" do
+    warrior.stub(:health => 10)
+    player = Player.new
+    player.stub(:hp => 10)
+
+    player.play_turn(warrior)
+
+    player.should_not have_archer_present
   end
 end
 
