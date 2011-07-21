@@ -1,24 +1,27 @@
 class Player
-  attr_reader :hp
+  attr_reader :hp, :direction
 
   def play_turn(warrior)
     @warrior = warrior
+
+    check_direction
     check_archer_presence
-    if warrior.feel.empty?
+
+    if warrior.feel(@direction).empty?
       if warrior.health > 18
-        warrior.walk!
+        warrior.walk!(@direction)
       else
         if has_archer_present?
-          warrior.walk!
+          warrior.walk!(@direction)
         else
           warrior.rest!
         end
       end
-    elsif warrior.feel.captive?
-      warrior.rescue!
+    elsif warrior.feel(@direction).captive?
+      warrior.rescue!(@direction)
     else
       if warrior.health > 10 || has_archer_present?
-        warrior.attack!
+        warrior.attack!(@direction)
       else
         warrior.walk! :backward
       end
@@ -32,7 +35,7 @@ class Player
 
   private
   def check_archer_presence
-    if @warrior.feel.empty?
+    if @warrior.feel(@direction).empty?
       @archer_present = hp_dropped_since_last_turn?
     end
   end
@@ -40,5 +43,10 @@ class Player
   def hp_dropped_since_last_turn?
     return false if hp.nil?
     @warrior.health < hp
+  end
+
+  def check_direction
+    @direction ||= :backward
+    @direction = :forward if @warrior.feel(@direction).wall?
   end
 end
