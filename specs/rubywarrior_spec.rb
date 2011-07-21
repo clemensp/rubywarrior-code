@@ -95,6 +95,10 @@ describe "a warrior" do
       player.stub :hp => 12 
       player.play_turn warrior 
     end
+
+    it "should go backwards when there is a wizard ahead" do
+
+    end
   end
 
   context "when there is a captive in front" do

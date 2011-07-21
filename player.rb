@@ -1,6 +1,9 @@
 class Player
   attr_reader :hp, :direction
 
+  MAXIMUM_TOP_UP_HP = 18
+  MINIMUM_MELEE_HP = 10
+
   def play_turn(warrior)
     @warrior = warrior
     set_warrior_direction
@@ -20,14 +23,10 @@ class Player
   end
 
   def handle_empty_space
-    if @warrior.health > 18
+    if @warrior.health > MAXIMUM_TOP_UP_HP || has_archer_present?
       @warrior.walk!(@direction)
     else
-      if has_archer_present?
-        @warrior.walk!(@direction)
-      else
-        @warrior.rest!
-      end
+      @warrior.rest!
     end
   end
 
@@ -36,7 +35,7 @@ class Player
   end
 
   def handle_enemy
-    if @warrior.health > 10 || has_archer_present?
+    if @warrior.health > MINIMUM_MELEE_HP || has_archer_present?
       if @direction == :backward
         pivot_forward
       else
