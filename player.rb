@@ -11,7 +11,7 @@ class Player
 
   def take_warrior_action
     if @warrior.feel(@direction).enemy?
-      handle_otherwise
+      handle_enemy
     elsif @warrior.feel(@direction).captive?
       handle_captive
     else
@@ -35,9 +35,13 @@ class Player
     @warrior.rescue!(@direction)
   end
 
-  def handle_otherwise
+  def handle_enemy
     if @warrior.health > 10 || has_archer_present?
-      @warrior.attack!(@direction)
+      if @direction == :backward
+        pivot_forward
+      else
+        @warrior.attack!(@direction)
+      end
     else
       @warrior.walk! :backward
     end
@@ -51,6 +55,11 @@ class Player
   def set_warrior_direction
     @direction ||= :backward
     @direction = :forward if @warrior.feel(@direction).wall?
+  end
+
+  def pivot_forward
+    @warrior.pivot!
+    @direction = :forward
   end
   
   def check_archer_presence_around_warrior

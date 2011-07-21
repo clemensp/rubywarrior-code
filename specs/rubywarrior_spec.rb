@@ -7,6 +7,7 @@ describe "a player" do
   before do 
     warrior.stub :feel => feel
     feel.stub :wall? => false
+    feel.stub :enemy? => false
   end
 
   it "should remember its warrior's last hp" do
@@ -136,8 +137,13 @@ describe "a warrior" do
       player.play_turn warrior 
     end
 
-    # it "should turn around if there is an enemy behind" do
-    #   feel.stub(:enemy? => true)
-    # end
+    it "should turn around if there is an enemy behind" do
+      feel.stub(:wall? => false)
+      feel.stub(:enemy? => true)
+      warrior.should_receive(:pivot!)
+      player = Player.new
+
+      player.play_turn warrior
+    end
   end
 end
