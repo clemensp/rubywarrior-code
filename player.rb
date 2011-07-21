@@ -3,30 +3,44 @@ class Player
 
   def play_turn(warrior)
     @warrior = warrior
+    set_warrior_direction
+    check_archer_presence_around_warrior
+    take_warrior_action
+    remember_warrior_hp
+  end
 
-    check_direction
-    check_archer_presence
-
-    if warrior.feel(@direction).empty?
-      if warrior.health > 18
-        warrior.walk!(@direction)
-      else
-        if has_archer_present?
-          warrior.walk!(@direction)
-        else
-          warrior.rest!
-        end
-      end
-    elsif warrior.feel(@direction).captive?
-      warrior.rescue!(@direction)
+  def take_warrior_action
+    if @warrior.feel(@direction).empty?
+      handle_empty_space
+    elsif @warrior.feel(@direction).captive?
+      handle_captive
     else
-      if warrior.health > 10 || has_archer_present?
-        warrior.attack!(@direction)
+      handle_otherwise
+    end
+  end
+
+  def handle_empty_space
+    if @warrior.health > 18
+      @warrior.walk!(@direction)
+    else
+      if has_archer_present?
+        @warrior.walk!(@direction)
       else
-        warrior.walk! :backward
+        @warrior.rest!
       end
     end
-    @hp = warrior.health
+  end
+
+  def handle_captive
+    @warrior.rescue!(@direction)
+  end
+
+  def handle_otherwise
+    if @warrior.health > 10 || has_archer_present?
+      @warrior.attack!(@direction)
+    else
+      @warrior.walk! :backward
+    end
   end
 
   def has_archer_present?
@@ -34,7 +48,12 @@ class Player
   end
 
   private
-  def check_archer_presence
+  def set_warrior_direction
+    @direction ||= :backward
+    @direction = :forward if @warrior.feel(@direction).wall?
+  end
+  
+  def check_archer_presence_around_warrior
     if @warrior.feel(@direction).empty?
       @archer_present = hp_dropped_since_last_turn?
     end
@@ -45,8 +64,7 @@ class Player
     @warrior.health < hp
   end
 
-  def check_direction
-    @direction ||= :backward
-    @direction = :forward if @warrior.feel(@direction).wall?
+  def remember_warrior_hp
+    @hp = @warrior.health
   end
 end
