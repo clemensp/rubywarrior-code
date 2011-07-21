@@ -87,12 +87,11 @@ describe "a warrior" do
       Player.new.play_turn warrior 
     end
 
-    it "should walk forward when hp is lower than 18 but the current hp is lower than the last turn's hp" do
-      warrior.stub :health => 9
+    it "should walk forward when an archer is present" do
       warrior.should_receive :walk! 
 
       player = Player.new
-      player.stub :hp => 12 
+      player.stub :has_archer_present? => true
       player.play_turn warrior 
     end
 
