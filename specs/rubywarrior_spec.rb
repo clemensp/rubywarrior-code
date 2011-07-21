@@ -64,6 +64,7 @@ describe "a warrior" do
     warrior.stub :feel => feel 
     feel.stub :empty? => false
     feel.stub :captive? => false
+    feel.stub :enemy? => false
   end
 
   context "when there is nothing in the way" do
@@ -107,19 +108,19 @@ describe "a warrior" do
     end
   end
 
-  context "when there is something in the way" do
+  context "when there is an enemy in the way" do
     before do
-      feel.stub :empty? => false
+      feel.stub :enemy? => true
     end
 
-    it "should attack when hp is greater than 10 if there is an enemy" do
+    it "should attack when hp is greater than 10" do
       warrior.stub :health => 15
       warrior.should_receive :attack! 
 
       Player.new.play_turn warrior 
     end
 
-    it "should back up when hp is at 10 or lower if there is an enemy" do
+    it "should back up when hp is at 10 or lower" do
       warrior.stub :health => 10
       warrior.should_receive(:walk!).with(:backward)
 
@@ -134,5 +135,9 @@ describe "a warrior" do
 
       player.play_turn warrior 
     end
+
+    # it "should turn around if there is an enemy behind" do
+    #   feel.stub(:enemy? => true)
+    # end
   end
 end

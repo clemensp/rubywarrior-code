@@ -10,12 +10,12 @@ class Player
   end
 
   def take_warrior_action
-    if @warrior.feel(@direction).empty?
-      handle_empty_space
+    if @warrior.feel(@direction).enemy?
+      handle_otherwise
     elsif @warrior.feel(@direction).captive?
       handle_captive
     else
-      handle_otherwise
+      handle_empty_space
     end
   end
 
