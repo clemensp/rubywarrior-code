@@ -3,9 +3,11 @@ require File.expand_path(__FILE__ + '/../../player')
 describe "a player" do
   let (:warrior) { mock('warrior').as_null_object }
   let (:feel) { mock('feel').as_null_object }
+  let (:look) { mock('look').as_null_object }
 
   before do 
     warrior.stub :feel => feel
+    warrior.stub :look => look
     feel.stub :wall? => false
     feel.stub :enemy? => false
   end
@@ -59,18 +61,21 @@ end
 
 describe "a warrior" do
   let (:warrior) { mock('warrior').as_null_object }
-  let (:feel) { mock('feel').as_null_object }
+  let (:empty_space) { mock('empty_space').as_null_object }
+  let (:captive_space) { mock('captive_space').as_null_object }
+  let (:enemy_space) { mock('enemy_space').as_null_object }
 
   before do 
-    warrior.stub :feel => feel 
-    feel.stub :empty? => false
-    feel.stub :captive? => false
-    feel.stub :enemy? => false
+    [empty_space, captive_space, enemy_space].each.with_index do |space, i|
+      space.stub :empty? => (0 == i)
+      space.stub :captive? => (1 == i)
+      space.stub :enemy? => (2 == i)
+    end
   end
 
   context "when there is nothing in the way" do
     before do
-      feel.stub :empty? => true
+      warrior.stub :feel => empty_space
     end
 
     it "should walk forward when hp is greater than 18" do
@@ -95,14 +100,16 @@ describe "a warrior" do
       player.play_turn warrior 
     end
 
-    it "should go backwards when there is a wizard ahead" do
-
-    end
+    # context "there is an enemy ahead" do
+    #   it "should shoot an arrow" do
+    #     warrior.should_receive(:look).and_return(look)
+    #   end
+    # end
   end
 
   context "when there is a captive in front" do
     before do
-      feel.stub :captive? => true
+      warrior.stub :feel => captive_space
     end
 
     it "should rescue" do
@@ -114,7 +121,7 @@ describe "a warrior" do
 
   context "when there is an enemy in the way" do
     before do
-      feel.stub :enemy? => true
+      warrior.stub :feel => enemy_space
     end
 
     it "should attack when hp is greater than 10" do
@@ -141,8 +148,8 @@ describe "a warrior" do
     end
 
     it "should turn around if there is an enemy behind" do
-      feel.stub(:wall? => false)
-      feel.stub(:enemy? => true)
+      enemy_space.stub :wall? => false
+      warrior.stub :feel => enemy_space
       warrior.should_receive(:pivot!)
       player = Player.new
 
