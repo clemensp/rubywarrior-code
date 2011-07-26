@@ -71,6 +71,7 @@ describe "a warrior" do
       space.stub :captive? => (1 == i)
       space.stub :enemy? => (2 == i)
     end
+    warrior.stub :look => [empty_space, empty_space, empty_space]
   end
 
   context "when there is nothing in the way" do
@@ -100,11 +101,34 @@ describe "a warrior" do
       player.play_turn warrior 
     end
 
-    # context "there is an enemy ahead" do
-    #   it "should shoot an arrow" do
-    #     warrior.should_receive(:look).and_return(look)
-    #   end
-    # end
+    context "there is something ahead" do
+      it "should walk forward when it is a captive" do
+        look = [empty_space, captive_space, enemy_space]
+        warrior.stub :look => look
+        warrior.should_receive :walk!
+
+        player = Player.new
+        player.play_turn warrior
+      end
+
+      it "should walk backwards when it is an enemy not at max range" do
+        look = [empty_space, enemy_space, empty_space]
+        warrior.stub :look => look
+        warrior.should_receive(:walk!).with(:backward)
+
+        player = Player.new
+        player.play_turn warrior
+      end
+
+      it "should shoot an arrow when it is an enemy at max range" do
+        look = [empty_space, empty_space, enemy_space]
+        warrior.stub :look => look
+        warrior.should_receive :shoot!
+
+        player = Player.new
+        player.play_turn warrior
+      end
+    end
   end
 
   context "when there is a captive in front" do

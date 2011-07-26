@@ -23,7 +23,20 @@ class Player
   end
 
   def handle_empty_space
-    if @warrior.health > MAXIMUM_TOP_UP_HP || has_archer_present?
+    first_non_empty_space = @warrior.look.find{|space| !space.empty?}
+    if first_non_empty_space
+      if first_non_empty_space.captive?
+        @warrior.walk!(@direction)
+      elsif first_non_empty_space.enemy?
+        if @warrior.look[1].enemy?
+          @warrior.walk!(:backward)
+        elsif @warrior.look[2].enemy?
+          @warrior.shoot!
+        end
+      else
+        @warrior.walk!
+      end
+    elsif @warrior.health > MAXIMUM_TOP_UP_HP || has_archer_present?
       @warrior.walk!(@direction)
     else
       @warrior.rest!
